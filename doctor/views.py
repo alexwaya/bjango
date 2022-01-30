@@ -4,7 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic.base import TemplateView
 from django.core.mail import EmailMessage
 from django.contrib import messages
-
+from .models import Appointment
 from django.conf import settings
 
 
@@ -39,5 +39,15 @@ class AppointmentTemplateView(TemplateView):
         mobile = request.POST.get("mobile")
         message = request.POST.get("request")
 
-        messages.add_message(request, messages.SUCCESS, f"{message}")
+        appointment = Appointment.objects.create(
+            first_name=fname,
+            last_name=lname,
+            email=email,
+            phone=mobile,
+            request=message,
+        )
+
+        appointment.save()
+
+        messages.add_message(request, messages.SUCCESS, f"Thanks {fname} for making an appointment, we will email ASAP!")
         return HttpResponseRedirect(request.path)
