@@ -19,7 +19,12 @@
 
 <body>
 
-  <div class="header" style="background: rgb(177, 177, 177) url({% static 'img/header.png' %}) no-repeat fixed center">
+  <div class="header" style=
+    "background: rgb(177, 177, 177) url({% static 'img/header.png' %}) no-repeat fixed center;
+    {% if 'appointment' in request.path %}
+        max-height:300px!important; min-height:300px!important;
+    {% endif %}
+    ">
     
     <nav class="navbar navbar-dark navbar-expand-md navigation-clean-search">
         <div class="container"><a class="navbar-brand" href="#">Family Doctor X</a>

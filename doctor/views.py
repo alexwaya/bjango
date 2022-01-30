@@ -1,8 +1,9 @@
 from email import message
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic.base import TemplateView
-from django.core.mail import EmailMessage, message
+from django.core.mail import EmailMessage
+from django.contrib import messages
 
 from django.conf import settings
 
@@ -25,3 +26,18 @@ class HomeTemplateView(TemplateView):
 
         email.send()
         return HttpResponse("Email sent successfully")
+
+
+
+class AppointmentTemplateView(TemplateView):
+    template_name = "appointment.html"
+
+    def post(self, request):
+        fname = request.POST.get("fname")
+        lname = request.POST.get("lname")
+        email = request.POST.get("email")
+        mobile = request.POST.get("mobile")
+        message = request.POST.get("request")
+
+        messages.add_message(request, messages.SUCCESS, f"{message}")
+        return HttpResponseRedirect(request.path)
