@@ -1,6 +1,8 @@
 from email import message
+import email
 from multiprocessing import context
 from pyexpat import model
+from urllib import request
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic.base import TemplateView
@@ -9,6 +11,9 @@ from django.contrib import messages
 from .models import Appointment
 from django.conf import settings
 from django.views.generic import ListView
+import datetime
+from django.template import Context
+from django.template.loader import render_to_string, get_template
 
 
 class HomeTemplateView(TemplateView):
@@ -63,11 +68,37 @@ class ManageAppointmentTemplateView(ListView):
     context_object_name = "appointments"
     paginate_by = 3
 
+    def post(self, request):
+        date = request.POST.get("date")
+        appointment_id = request.POST.get("appointment-id")
+        appointment = Appointment.objects.get(id=appointment_id)
+        appointment.accepted = True
+        appointment.accepted_date = datetime.datetime.now()
+        appointment.save()
+
+        data = {
+            "fname":appointment.first_name,
+            "date":date,
+        }
+
+
+        message = get_template('email.html').render(data)
+        email = EmailMessage(
+            "About your appointment",
+            message,
+            settings.EMAIL_HOST_USER,
+            [appointment.email],
+        )
+        email.content_subtype = "html"
+        email.send()
+
+        messages.add_message(request, messages.SUCCESS, f"You accepted the appointment of {appointment.first_name}")
+        return HttpResponseRedirect(request.path)
+
     def get_context_data(self,*args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         appointments = Appointment.objects.all()
         context.update({
-            
-            "title":"Manage",
+            "title":"Manage Appointments",
         })
         return context
