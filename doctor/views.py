@@ -1,4 +1,5 @@
 from email import message
+from multiprocessing import context
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic.base import TemplateView
@@ -56,3 +57,12 @@ class AppointmentTemplateView(TemplateView):
 class ManageAppointmentTemplateView(TemplateView):
     template_name = "manage-appointments.html"
     login_required = True
+
+    def get_context_data(self,*args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        appointments = Appointment.objects.all()
+        context.update({
+            "appointments":appointments,
+            "title":"Manage",
+        })
+        return context
