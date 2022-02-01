@@ -1,5 +1,6 @@
 from email import message
 from multiprocessing import context
+from pyexpat import model
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic.base import TemplateView
@@ -7,6 +8,7 @@ from django.core.mail import EmailMessage
 from django.contrib import messages
 from .models import Appointment
 from django.conf import settings
+from django.views.generic import ListView
 
 
 class HomeTemplateView(TemplateView):
@@ -54,15 +56,18 @@ class AppointmentTemplateView(TemplateView):
         return HttpResponseRedirect(request.path)
 
 
-class ManageAppointmentTemplateView(TemplateView):
+class ManageAppointmentTemplateView(ListView):
     template_name = "manage-appointments.html"
     login_required = True
+    model = Appointment
+    context_object_name = "appointments"
+    paginate_by = 3
 
     def get_context_data(self,*args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         appointments = Appointment.objects.all()
         context.update({
-            "appointments":appointments,
+            
             "title":"Manage",
         })
         return context
