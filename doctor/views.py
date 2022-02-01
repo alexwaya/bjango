@@ -51,3 +51,8 @@ class AppointmentTemplateView(TemplateView):
 
         messages.add_message(request, messages.SUCCESS, f"Thanks {fname} for making an appointment, we will email ASAP!")
         return HttpResponseRedirect(request.path)
+
+
+class ManageAppointmentTemplateView(TemplateView):
+    template_name = "manage-appointments.html"
+    login_required = True
